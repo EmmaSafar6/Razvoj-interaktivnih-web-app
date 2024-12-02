@@ -15,7 +15,8 @@ export default {
   setup(){
     const initialMap = ref('');
     onMounted(() => {
-        initialMap.value = L.map('map').setView([45.3312,14.4322], 13);
+      initialMap.value = L.map('map').setView([45.3264, 14.4411], 19);
+
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy;<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'

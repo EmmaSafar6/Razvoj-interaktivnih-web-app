@@ -2,11 +2,11 @@
   <q-page padding>
     <q-card dark bordered class="bg-grey-9 my-card">
       <q-card-section>
-        <q-img src="https://i.pinimg.com/originals/7a/ce/5c/7ace5c00655073f0c63b5b78e5275caf.jpg">
+        <img alt="Slika Biljke" src="Logo.png">
           <div class="text-h3 text-weight-bolder absolute-bottom text-center">
             O nama
           </div>
-        </q-img>
+        <img>
       </q-card-section>
       <q-card-section class="text-h4 text-justify">
         {{ o_nama }}
@@ -28,4 +28,4 @@ export default {
 <style lang="sass" scoped>
 .my-card
   width: 100%
-</style>
+</style> neucitava mi se slika
