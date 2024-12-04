@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          Quasar App
+          Plantie
         </q-toolbar-title>
 
         <div>Quasar v{{ $q.version }}</div>
@@ -28,14 +28,25 @@
         <q-item-label
           header
         >
-          Essential Links
+          Izbornik
         </q-item-label>
 
-        <EssentialLink
+       <q-item
           v-for="link in linksList"
           :key="link.title"
-          v-bind="link"
-        />
+          clickable
+          tag="router-link"
+          :to="link.to"
+        >
+          <q-item-section avatar>
+            <q-icon :name="link.icon" />
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label>{{ link.title }}</q-item-label>
+            <q-item-label caption>{{ link.caption }}</q-item-label>
+          </q-item-section>
+        </q-item>
       </q-list>
     </q-drawer>
 
@@ -55,48 +66,49 @@ defineOptions({
 
 const linksList = [
   {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
+    title: 'Naslovna',
+    caption: 'Početna stranica',
+    icon: 'home',
+    to: '/'
+  },
+   {
+    title: 'Popis svih biljaka',
+    caption: 'Pogledajte sve ponuđene biljke!',
+    icon: 'library_books',
+    to: '/popisbilja'
   },
   {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
+    title: 'PretrazivanjeBilja',
+    caption: 'Pretraži bilja',
+    icon: 'search',
+    to: '/pretrazivanje'
   },
   {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
+    title: 'O nama',
+    caption: 'Informacije o Plantie trgovini',
+    icon: 'info',
+    to: '/onama'
   },
   {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
+    title: 'Lokacija',
+    caption: 'Naša lokacija',
+    icon: 'place',
+    to: '/lokacija'
   },
   {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
+    title: 'Login',
+    caption: 'Prijavite se',
+    icon: 'login',
+    to: '/login'
   },
   {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
+    title: 'Registracija',
+    caption: 'Registrirajte se',
+    icon: 'person_add',
+    to: '/registracija'
   }
 ]
+
 
 const leftDrawerOpen = ref(false)
 
