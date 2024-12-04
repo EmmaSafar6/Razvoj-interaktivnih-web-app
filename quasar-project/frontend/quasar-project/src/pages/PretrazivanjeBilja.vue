@@ -2,7 +2,7 @@
   <q-page padding>
     <q-card>
       <q-card-section>
-        <div class="text-h4">Pretraži Knjige</div>
+        <div class="text-h4">Pretraži biljke</div>
       </q-card-section>
 
       <q-card-section>
@@ -14,22 +14,22 @@
           clearable
         />
 
-        <!-- Checkbox za odabir pretrage po autoru ili naslovu -->
+        <!-- Checkbox za odabir pretrage po kategoriji ili nazivu -->
         <div class="q-mt-md">
           <q-checkbox
             v-model="searchByAuthor"
-            label="Pretraži po autoru"
+            label="Pretraži po kategoriji"
           />
           <q-checkbox
             v-model="searchByTitle"
-            label="Pretraži po naslovu"
+            label="Pretraži po nazivu"
           />
         </div>
 
         <!-- Gumb za pretragu -->
         <q-btn
           label="Traži"
-          color="primary"
+          color="green"
           class="q-mt-md"
           @click="searchBooks"
         />
@@ -70,7 +70,7 @@ export default {
 
     const filteredBooks = ref([]);
 
-    // Funkcija za pretraživanje knjiga
+    // Funkcija za pretraživanje biljke
 function searchBooks() {
    filteredBooks.value = books.value.filter((book) => {
       const matchesAuthor = searchByAuthor.value && book.author.toLowerCase().includes(searchQuery.value.toLowerCase());
