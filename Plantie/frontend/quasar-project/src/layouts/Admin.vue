@@ -79,25 +79,25 @@ const linksList = [
     title: 'Korisnici',
     caption: 'Upravljanje korisnicima',
     icon: 'user',
-    to: '/admin/popisKnjiga'
+    to: '/admin/korisnici'
   },
   {
     title: 'Biljke',
     caption: 'Upravljanje biljkama',
     icon: 'search',
-    to: '/admin/pretrazivanje'
+    to: '/admin/biljke'
   },
   {
     title: 'Narudžbe',
     caption: 'Upravljanje narudžbama',
     icon: 'info',
-    to: '/admin/popis_korisnika'
+    to: '/admin/narudzbe'
   },
   {
     title: 'Objave',
     caption: 'Upravljanje objavama',
     icon: 'local_library',
-    to: '/admin/unos_knjiga'
+    to: '/admin/objave'
   }
 ]
 
