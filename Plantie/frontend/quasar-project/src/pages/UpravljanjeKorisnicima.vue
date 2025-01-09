@@ -9,11 +9,11 @@
 
     <!-- Button ispod tablice -->
     <div class="q-pa-md">
-      <q-btn 
-        label="Dodaj korisnika" 
-        color="primary" 
-        @click="dodajKorisnika" 
-        class="full-width" 
+      <q-btn
+        label="Ukloni korisnika"
+        color="primary"
+        @click="ukloniKorisnika"
+        class="full-width"
       />
     </div>
   </q-page>
@@ -52,10 +52,21 @@ export default {
       }
     };
 
-    const dodajKorisnika = () => {
-      console.log("Klik na 'Dodaj korisnika'");
+    const ukloniKorisnika = async (ID_korisnika) => {
+  console.log("Klik na 'Ukloni korisnika'");
+  try {
+    // Zamjena :ID_korisnika stvarnim ID-em
+    const response = await axios.delete(`http://localhost:3000/api/Korisnik/${ID_korisnika}`);
+    console.log("Podaci iz API-ja:", response.data); // Ispisivanje podataka koje vraća API
+
+    // Ažuriranje liste korisnika (ako je potrebno)
+    korisnici.value = korisnici.value.filter(korisnik => korisnik.ID_korisnika !== ID_korisnika);
+  } catch (error) {
+    console.error("Greška prilikom brisanja korisnika:", error);
+  }
+};
+
       // Ovdje dodaj logiku za dodavanje korisnika
-    };
 
     onMounted(() => {
       fetchKorisnik();
@@ -64,7 +75,7 @@ export default {
     return {
       korisnici,
       columns,
-      dodajKorisnika
+      ukloniKorisnika
     };
   }
 };

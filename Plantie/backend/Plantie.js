@@ -25,7 +25,7 @@ connection.connect((err) => {  //Uspostavljanje veze
   }
 });
 
-////ENDPOINTI ZA ADMINA:
+////ENDPOINTI ZA ADMINA:-------------------------------------------------------------------------------------------
 
 
 // ENDPOINT POPIS KORISNIKA
@@ -64,9 +64,25 @@ app.get("/api/narudzbe", (request, response) => {
         }
       });
     });
+ // ENDPOINT Brisanje korisnika
+    app.delete('/api/Korisnik/:ID_korisnika', (req, res) => {
+      const ID_korisnika = req.params.ID_korisnika;
+    
+      const query = 'DELETE FROM Korisnik WHERE ID_korisnika = ?';
+    
+      connection.query(query, [ID_korisnika], (err, results) => {
+        if (err) {
+          console.error('Greška prilikom brisanja korisnika:', err);
+          res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+          res.json({ message: 'Korisnik uspješno obrisan' });
+        }
+      });
+    });
+    
 
 
-///KRAJ ADMINA
+///KRAJ ADMINA--------------------------------------------------------------------------------------------------------------------------
 
 
 app.use((err, req, res, next) => { //Greška u middleware funkciji

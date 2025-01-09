@@ -90,7 +90,7 @@ export default {
       this.$router.push({ name: 'AdminPage' });
     } else {
       // Notify the user if the admin ID is invalid (id_exists is 0)
-      alert('Neispravan ID admina.');}
+      alert('Ne, ne! Neispravan ID admina.');}
     } catch (error) {
       console.error('Error during admin login:', error);
       alert('Došlo je do greške pri prijavi.');
