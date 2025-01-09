@@ -7,15 +7,58 @@
       row-key="naslov"
     />
 
-    <!-- Button ispod tablice -->
-    <div class="q-pa-md">
-      <q-btn
-        label="Ukloni korisnika"
-        color="primary"
-        @click="ukloniKorisnika"
-        class="full-width"
-      />
+    <!-- Mali FAB ispod tablice -->
+    <div class="q-pa-md flex flex-center">
+      <q-fab
+        v-model="fab"
+        label="Opcije admina"
+        color="green"
+        icon="menu"
+        direction="down"
+        size="sm"
+      >
+        <!-- Akcija za dodavanje korisnika -->
+        <q-fab-action color="primary" @click="otvoriDodavanjeKorisnika" icon="add" label="Dodaj korisnika" />
+        
+        <!-- Akcija za uklanjanje korisnika -->
+        <q-fab-action color="negative" @click="otvoriUklanjanjeKorisnika" icon="delete" label="Ukloni korisnika" />
+      </q-fab>
     </div>
+
+    <!-- Popup za dodavanje korisnika -->
+    <q-dialog v-model="prikaziDodajKorisnika">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">Dodavanje korisnika</div>
+        </q-card-section>
+        <q-card-section>
+          <q-input v-model="noviKorisnik.ime" label="Ime" />
+          <q-input v-model="noviKorisnik.prezime" label="Prezime" />
+          <q-input v-model="noviKorisnik.email" label="Email" />
+          <q-input v-model="noviKorisnik.telefon" label="Telefon" />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Odustani" color="primary" @click="prikaziDodajKorisnika = false" />
+          <q-btn flat label="Dodaj" color="primary" @click="dodajKorisnika" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <!-- Popup za uklanjanje korisnika -->
+    <q-dialog v-model="prikaziUkloniKorisnika">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">Uklanjanje korisnika</div>
+        </q-card-section>
+        <q-card-section>
+          <q-input v-model="korisnikZaUklanjanje" label="Unesite ID korisnika" />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Odustani" color="primary" @click="prikaziUkloniKorisnika = false" />
+          <q-btn flat label="Ukloni" color="negative" @click="ukloniKorisnika(korisnikZaUklanjanje)" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -32,41 +75,47 @@ export default {
       { name: 'Ime_korisnika', align: 'left', label: 'Ime', field: 'Ime_korisnika' },
       { name: 'Prezime_korisnika', align: 'left', label: 'Prezime', field: 'Prezime_korisnika' },
       { name: 'Email_korisnika', align: 'left', label: 'Email', field: 'Email_korisnika' },
-      { name: 'Adresa_korisnika', align: 'left', label: 'Adresa', field: 'Adresa_korisnika' },
       { name: 'Kontakt_korisnika', align: 'left', label: 'Telefon', field: 'Kontakt_korisnika' },
-      {
-        name: 'korisnik',
-        align: 'left',
-        label: 'Korisnik',
-        field: row => `${row.Ime_korisnika} ${row.Prezime_korisnika}` // Spajamo ime i prezime
-      }
     ];
+
+    const fab = ref(false);
+    const prikaziDodajKorisnika = ref(false);
+    const prikaziUkloniKorisnika = ref(false);
+    const noviKorisnik = ref({ ime: "", prezime: "", email: "", telefon: "" });
+    const korisnikZaUklanjanje = ref("");
 
     const fetchKorisnik = async () => {
       try {
         const response = await axios.get("http://localhost:3000/api/korisnici");
-        console.log("Podaci iz API-ja:", response.data); // Ispisivanje podataka koje vraća API
         korisnici.value = response.data;
       } catch (error) {
         console.error("Greška prilikom dohvaćanja korisnika:", error);
       }
     };
 
+    const dodajKorisnika = async () => {
+      console.log("Dodavanje korisnika:", noviKorisnik.value);
+      prikaziDodajKorisnika.value = false;
+    };
+
     const ukloniKorisnika = async (ID_korisnika) => {
-  console.log("Klik na 'Ukloni korisnika'");
-  try {
-    // Zamjena :ID_korisnika stvarnim ID-em
-    const response = await axios.delete(`http://localhost:3000/api/Korisnik/${ID_korisnika}`);
-    console.log("Podaci iz API-ja:", response.data); // Ispisivanje podataka koje vraća API
+      console.log("Uklanjanje korisnika s ID-jem:", ID_korisnika);
+      try {
+        await axios.delete(`http://localhost:3000/api/Korisnik/${ID_korisnika}`);
+        korisnici.value = korisnici.value.filter(k => k.ID_korisnika !== ID_korisnika);
+        prikaziUkloniKorisnika.value = false;
+      } catch (error) {
+        console.error("Greška prilikom brisanja korisnika:", error);
+      }
+    };
 
-    // Ažuriranje liste korisnika (ako je potrebno)
-    korisnici.value = korisnici.value.filter(korisnik => korisnik.ID_korisnika !== ID_korisnika);
-  } catch (error) {
-    console.error("Greška prilikom brisanja korisnika:", error);
-  }
-};
+    const otvoriDodavanjeKorisnika = () => {
+      prikaziDodajKorisnika.value = true;
+    };
 
-      // Ovdje dodaj logiku za dodavanje korisnika
+    const otvoriUklanjanjeKorisnika = () => {
+      prikaziUkloniKorisnika.value = true;
+    };
 
     onMounted(() => {
       fetchKorisnik();
@@ -75,7 +124,15 @@ export default {
     return {
       korisnici,
       columns,
-      ukloniKorisnika
+      fab,
+      prikaziDodajKorisnika,
+      prikaziUkloniKorisnika,
+      noviKorisnik,
+      korisnikZaUklanjanje,
+      dodajKorisnika,
+      ukloniKorisnika,
+      otvoriDodavanjeKorisnika,
+      otvoriUklanjanjeKorisnika,
     };
   }
 };
