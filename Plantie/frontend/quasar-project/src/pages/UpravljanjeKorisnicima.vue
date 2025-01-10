@@ -94,12 +94,23 @@ export default {
     };
 
     const dodajKorisnika = async () => {
-      console.log("Dodavanje korisnika:", noviKorisnik.value);
-      prikaziDodajKorisnika.value = false;
+      try {
+        const response = await axios.post("http://localhost:3000/api/Korisnik", noviKorisnik.value);
+        korisnici.value.push({
+          ID_korisnika: response.data.id, // Pretpostavka da backend vraća ID
+          Ime_korisnika: noviKorisnik.value.ime,
+          Prezime_korisnika: noviKorisnik.value.prezime,
+          Email_korisnika: noviKorisnik.value.email,
+          Kontakt_korisnika: noviKorisnik.value.telefon,
+        });
+        noviKorisnik.value = { ime: "", prezime: "", email: "", telefon: "" };
+        prikaziDodajKorisnika.value = false;
+      } catch (error) {
+        console.error("Greška prilikom dodavanja korisnika:", error);
+      }
     };
 
     const ukloniKorisnika = async (ID_korisnika) => {
-      console.log("Uklanjanje korisnika s ID-jem:", ID_korisnika);
       try {
         await axios.delete(`http://localhost:3000/api/Korisnik/${ID_korisnika}`);
         korisnici.value = korisnici.value.filter(k => k.ID_korisnika !== ID_korisnika);

@@ -9,6 +9,8 @@ const port = 3000;
 app.use(cors({
   origin: 'http://localhost:9000'
 }));
+app.use(bodyParser.json());
+
 // MYSQL VEZA
 const connection = mysql.createConnection({ //Stvaranje veze s bazom dmudric, te ispis njenih podataka
   host: 'ucka.veleri.hr',
@@ -66,19 +68,21 @@ app.get("/api/narudzbe", (request, response) => {
     });
 
     
-// ENDPOINT - Dodavanje novog korisnika
-app.post('/api/Korisnik', (req, res) => {
-  const { ime, prezime, email, telefon } = req.body;
-  const query = `INSERT INTO Korisnik (Ime_korisnika, Prezime_korisnika, Email_korisnika, Kontakt_korisnika) VALUES (?, ?, ?, ?)`;
-  
-  connection.query(query, [ime, prezime, email, telefon], (err, results) => {
-    if (err) {
-      res.status(500).json({ error: 'Greška pri dodavanju korisnika' });
-    } else {
-      res.status(200).json({ message: 'Korisnik uspješno dodan' });
-    }
-  });
-});
+    //ENDPOINT DODAJ KORISNIKA
+    app.post('/api/Korisnik', (req, res) => {
+      const { ime, prezime, email, telefon } = req.body;
+      const query = `INSERT INTO Korisnik (Ime_korisnika, Prezime_korisnika, Email_korisnika, Kontakt_korisnika) VALUES (?, ?, ?, ?)`;
+      
+      connection.query(query, [ime, prezime, email, telefon], (err, results) => {
+        if (err) {
+          console.error('Greška pri dodavanju korisnika:', err);
+          res.status(500).json({ error: 'Greška pri dodavanju korisnika' });
+        } else {
+          res.status(200).json({ id: results.insertId, message: 'Korisnik uspješno dodan' });
+        }
+      });
+    });    
+    
 
 // API za brisanje korisnika
 app.delete('/api/Korisnik/:ID_korisnika', (req, res) => {
@@ -93,27 +97,30 @@ app.delete('/api/Korisnik/:ID_korisnika', (req, res) => {
     res.json({ message: 'Korisnik uspješno obrisan' });
   });
 });
+  
 
 // Backend API za dodavanje biljke
-app.post("/api/biljke", (req, res) => {
-  const { nazivBiljke, vrstaBiljke, opisBiljke, dostupnaKolicina, cijena } = req.body;
+app.post("/api/Biljka", (req, res) => {
+  const { naziv, vrsta, opis, kolicina, cijena } = req.body;
   const query = `INSERT INTO Biljka (nazivBiljke, vrstaBiljke, opisBiljke, dostupnaKolicina, cijena) VALUES (?, ?, ?, ?, ?)`;
-  
-  connection.query(query, [nazivBiljke, vrstaBiljke, opisBiljke, dostupnaKolicina, cijena], (err, results) => {
+
+  connection.query(query, [naziv, vrsta, opis, kolicina, cijena], (err, results) => {
     if (err) {
       console.error('Greška prilikom dodavanja biljke:', err);
       res.status(500).json({ error: 'Greška prilikom dodavanja biljke' });
     } else {
-      res.status(201).json({ message: 'Biljka uspješno dodana', biljkaId: results.insertId });
+      // Ako je biljka uspješno dodana, vraćamo odgovor s podacima
+      res.status(200).json({ id: results.insertId, message: 'Biljka uspješno dodana' });
     }
   });
 });
 
+
 // ENDPOINT - Brisanje biljke prema ID-u
 app.delete("/api/biljke/:sifraBiljke", (req, res) => {
-  const biljkaId = req.params.id;
+  const { sifraBiljke } = req.params;
   const query = 'DELETE FROM Biljka WHERE sifraBiljke = ?';
-  
+
   connection.query(query, [sifraBiljke], (err, results) => {
     if (err) {
       console.error('Greška prilikom brisanja biljke:', err);
@@ -123,14 +130,17 @@ app.delete("/api/biljke/:sifraBiljke", (req, res) => {
   });
 });
 
-// ENDPOINT - Dodavanje nove narudžbe
-app.post("/api/narudzbe", (req, res) => {
-  const { ID_korisnika, sifraBiljke, kolicina, datumPrimanja, total } = req.body;
+// ENDPOINT - dodavanje narudzbe
 
-  // Upit za umetanje nove narudžbe u tablicu Kosarica
-  const query = `INSERT INTO Kosarica (ID_korisnika, sifraBiljke, kolicina, datumPrimanja, total) VALUES (?, ?, ?, ?, ?)`;
+app.post("/api/PregledNarudzbiKorisnika", (req, res) => {
+  const { nazivBiljke, velicinaBiljke, kolicina, ID_korisnika, sifraBiljke, datumPrimanja, total } = req.body;
 
-  connection.query(query, [ID_korisnika, sifraBiljke, kolicina, datumPrimanja, total], (err, results) => {
+  // Ako datum nije poslan, postaviti na trenutni datum u ispravnom formatu
+  const datum = datumPrimanja || new Date().toISOString().slice(0, 19).replace("T", " "); // Prilagodba formata
+
+  const query = `INSERT INTO Narudzba (nazivBiljke, velicinaBiljke, kolicina, ID_korisnika, sifraBiljke, datumPrimanja, total) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+
+  connection.query(query, [nazivBiljke, velicinaBiljke, kolicina, ID_korisnika, sifraBiljke, datum, total], (err, results) => {
     if (err) {
       console.error('Greška prilikom dodavanja narudžbe:', err);
       return res.status(500).json({ error: 'Greška prilikom dodavanja narudžbe' });
@@ -138,17 +148,17 @@ app.post("/api/narudzbe", (req, res) => {
 
     res.status(201).json({
       message: 'Narudžba uspješno dodana',
-      narudzbaId: results.insertId // ID nove narudžbe
+      narudzbaId: results.insertId
     });
   });
 });
 
 // ENDPOINT - Brisanje narudžbe prema ID-u
-app.delete("/api/narudzbe/:id", (req, res) => {
-  const narudzbaId = req.params.id;
-  const query = 'DELETE FROM Kosarica WHERE ID_Kosarice = ?';
+app.delete("/api/narudzbe/:ID_narudzbe", (req, res) => {
+  const ID_narudzbe = req.params.id;
+  const query = 'DELETE FROM Narudzbe WHERE ID_narudzbe = ?';
   
-  connection.query(query, [narudzbaId], (err, results) => {
+  connection.query(query, [ID_narudzbe], (err, results) => {
     if (err) {
       console.error('Greška prilikom brisanja narudžbe:', err);
       return res.status(500).json({ error: 'Greška prilikom brisanja narudžbe' });
@@ -159,6 +169,8 @@ app.delete("/api/narudzbe/:id", (req, res) => {
     res.json({ message: 'Narudžba uspješno obrisana' });
   });
 });
+
+
 
 ///KRAJ ADMINA--------------------------------------------------------------------------------------------------------------------------
 

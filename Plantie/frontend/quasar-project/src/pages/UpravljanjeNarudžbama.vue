@@ -86,15 +86,24 @@ export default {
     const fab = ref(false);
     const prikaziDodajNarudzbu = ref(false);
     const prikaziUkloniNarudzbu = ref(false);
-    const novaNarudzba = ref({
-      nazivBiljke: '',
-      velicinaBiljke: '',
-      kolicina: 0,
-      ID_korisnika: '',
-      sifraBiljke: '',
-      total: 0,
-    });
+    const novaNarudzba = ref({ nazivBiljke: "", velicinaBiljke: "", kolicina: 0, ID_korisnika: "", sifraBiljke: "", total: 0 });
     const idNarudzbeZaUklanjanje = ref("");
+
+    // Funkcija za formatiranje datuma u željeni format
+    const formatirajDatum = (datum) => {
+      const d = new Date(datum);
+      
+      const godina = d.getFullYear();
+      const mjesec = String(d.getMonth() + 1).padStart(2, '0'); // Mjeseci su od 0, pa dodajemo 1
+      const dan = String(d.getDate()).padStart(2, '0');
+      
+      const sati = String(d.getHours()).padStart(2, '0');
+      const minuti = String(d.getMinutes()).padStart(2, '0');
+      const sekunde = String(d.getSeconds()).padStart(2, '0');
+      
+      // Vraćamo datum u formatu "YYYY-MM-DD HH:mm:ss"
+      return `${godina}-${mjesec}-${dan} ${sati}:${minuti}:${sekunde}`;
+    };
 
     // Axios poziv za dohvat svih narudžbi
     const fetchNarudzbe = async () => {
@@ -109,8 +118,24 @@ export default {
     // Axios poziv za dodavanje narudžbe
     const dodajNarudzbu = async () => {
       try {
-        const response = await axios.post("http://localhost:3000/api/narudzbe", novaNarudzba.value);
-        narudzbe.value.push(response.data); // Dodaj novu narudžbu u tablicu
+        const datumPrimanja = formatirajDatum(new Date()); // Formatiramo trenutni datum
+        const response = await axios.post("http://localhost:3000/api/PregledNarudzbiKorisnika", {
+          ...novaNarudzba.value,
+          datumPrimanja: datumPrimanja, // Dodajemo formatirani datum
+        });
+
+        narudzbe.value.push({
+          ID_Kosarice: response.data.narudzbaId,
+          nazivBiljke: novaNarudzba.value.nazivBiljke,
+          velicinaBiljke: novaNarudzba.value.velicinaBiljke,
+          kolicina: novaNarudzba.value.kolicina,
+          ID_korisnika: novaNarudzba.value.ID_korisnika,
+          sifraBiljke: novaNarudzba.value.sifraBiljke,
+          datumPrimanja: datumPrimanja, // Dodajemo datum u tablicu
+          total: novaNarudzba.value.total,
+        });
+
+        novaNarudzba.value = { nazivBiljke: "", velicinaBiljke: "", kolicina: 0, ID_korisnika: "", sifraBiljke: "", total: 0 };
         prikaziDodajNarudzbu.value = false;
       } catch (error) {
         console.error("Greška prilikom dodavanja narudžbe:", error);
@@ -118,10 +143,10 @@ export default {
     };
 
     // Axios poziv za brisanje narudžbe prema ID-u
-    const ukloniNarudzbu = async (idNarudzbe) => {
+    const ukloniNarudzbu = async (ID_narudzbe) => {
       try {
-        await axios.delete(`http://localhost:3000/api/narudzbe/${idNarudzbe}`);
-        narudzbe.value = narudzbe.value.filter(n => n.ID_Kosarice !== idNarudzbe); // Ukloni narudžbu iz tablice
+        await axios.delete(`http://localhost:3000/api/narudzbe/${ID_narudzbe}`);
+        narudzbe.value = narudzbe.value.filter(n => n.ID_Kosarice !== ID_narudzbe); // Ukloni narudžbu iz tablice
         prikaziUkloniNarudzbu.value = false;
       } catch (error) {
         console.error("Greška prilikom brisanja narudžbe:", error);

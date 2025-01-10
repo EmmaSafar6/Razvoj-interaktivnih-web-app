@@ -1,5 +1,58 @@
 <template>
   <q-page padding>
+    <!-- Carousel na vrhu s ponudama -->
+    <div class="q-pa-md">
+      <q-carousel
+        v-model="slide"
+        vertical
+        transition-prev="slide-down"
+        transition-next="slide-up"
+        swipeable
+        animated
+        control-color="white"
+        navigation-icon="radio_button_unchecked"
+        navigation
+        padding
+        arrows
+        height="300px"
+        class="bg-teal text-white shadow-1 rounded-borders"
+      >
+        <!-- Ponuda 1 -->
+        <q-carousel-slide name="ponuda1" class="column no-wrap flex-center">
+          <q-icon name="local_offer" size="56px" />
+          <div class="q-mt-md text-center">
+            <div class="text-h6">20% popusta na Ruže!</div>
+            <div class="text-body1">Iskoristite priliku da uljepšate svoj dom.</div>
+          </div>
+        </q-carousel-slide>
+        <!-- Ponuda 2 -->
+        <q-carousel-slide name="ponuda2" class="column no-wrap flex-center">
+          <q-icon name="local_florist" size="56px" />
+          <div class="q-mt-md text-center">
+            <div class="text-h6">Posebna cijena za Kaktuse!</div>
+            <div class="text-body1">Savršeni za svaki interijer.</div>
+          </div>
+        </q-carousel-slide>
+        <!-- Ponuda 3 -->
+        <q-carousel-slide name="ponuda3" class="column no-wrap flex-center">
+          <q-icon name="spa" size="56px" />
+          <div class="q-mt-md text-center">
+            <div class="text-h6">Popust na Sobne biljke!</div>
+            <div class="text-body1">Unesite svježinu u svoj prostor.</div>
+          </div>
+        </q-carousel-slide>
+        <!-- Ponuda 4 -->
+        <q-carousel-slide name="ponuda4" class="column no-wrap flex-center">
+          <q-icon name="eco" size="56px" />
+          <div class="q-mt-md text-center">
+            <div class="text-h6">Akcija na Bonsai drveće!</div>
+            <div class="text-body1">Dodajte egzotični šarm svom vrtu.</div>
+          </div>
+        </q-carousel-slide>
+      </q-carousel>
+    </div>
+
+    <!-- Kartice biljaka ispod -->
     <div class="kvadrati-container">
       <div v-for="(biljka, index) in biljke" :key="biljka.id" class="kvadrat">
         <q-card class="my-card">
@@ -37,13 +90,14 @@ export default {
   name: "ObjavePage",
   data() {
     return {
+      slide: "ponuda1", // Početni slajd
       biljke: [
         { id: 1, naziv: "Ruza", opis: "Najelegantniji cvijet u ponudi." },
-        { id: 2, naziv: "Biljka2", opis: "Opis biljke." },
-        { id: 3, naziv: "Biljka3", opis: "Opis biljke." },
-        { id: 4, naziv: "Biljka4", opis: "Opis biljke." },
-        { id: 5, naziv: "Biljka5", opis: "Opis biljke." },
-        { id: 6, naziv: "Biljka6", opis: "Opis biljke." },
+        { id: 2, naziv: "Kaktus", opis: "Savršen za svaki interijer." },
+        { id: 3, naziv: "Sobna biljka", opis: "Unesite svježinu u prostor." },
+        { id: 4, naziv: "Bonsai", opis: "Egzotični šarm za vaš vrt." },
+        { id: 5, naziv: "Orhideja", opis: "Luksuzan dodatak vašem domu." },
+        { id: 6, naziv: "Lavanda", opis: "Mirisna biljka za opuštanje." },
       ],
     };
   },

@@ -83,13 +83,12 @@ export default {
     const fab = ref(false);
     const prikaziDodajBiljku = ref(false);
     const prikaziUkloniBiljku = ref(false);
-    const novaBiljka = ref({ naziv: '', vrsta: '', opis: '', kolicina: 0, cijena: 0 });
+    const novaBiljka = ref({ naziv: "", vrsta: "", opis: "", kolicina: 0, cijena: 0 });
     const idBiljkeZaUklanjanje = ref("");
 
     // Axios poziv za dohvat svih biljaka
     const fetchBiljke = async () => {
       try {
-        // Ovdje je Axios GET poziv za dohvat svih biljaka iz API-ja
         const response = await axios.get("http://localhost:3000/api/biljke");
         biljke.value = response.data;
       } catch (error) {
@@ -97,24 +96,31 @@ export default {
       }
     };
 
-    // Axios poziv za dodavanje nove biljke
+    // Dodavanje biljke
+
     const dodajBiljku = async () => {
       try {
-        // Ovdje je Axios POST poziv za dodavanje biljke u bazu
-        const response = await axios.post("http://localhost:3000/api/biljke", novaBiljka.value);
-        biljke.value.push(response.data); // Dodaj novu biljku u tablicu
+        const response = await axios.post("http://localhost:3000/api/Biljka", novaBiljka.value);
+        biljke.value.push({
+          sifraBiljke: response.data.id, // Pretpostavka da backend vraća ID
+          nazivBiljke: novaBiljka.value.naziv,
+          vrstaBiljke: novaBiljka.value.vrsta,
+          opisBiljke: novaBiljka.value.opis,
+          dostupnaKolicina: novaBiljka.value.kolicina,
+          cijena: novaBiljka.value.cijena,
+        });
+        novaBiljka.value = { naziv: "", vrsta: "", opis: "", kolicina: "", cijena: ""};
         prikaziDodajBiljku.value = false;
       } catch (error) {
         console.error("Greška prilikom dodavanja biljke:", error);
       }
     };
 
-    // Axios poziv za brisanje biljke prema ID-u
+    // Brisanje biljke prema ID-u
     const ukloniBiljku = async (idBiljke) => {
       try {
-        // Ovdje je Axios DELETE poziv za brisanje biljke prema ID-u
         await axios.delete(`http://localhost:3000/api/biljke/${idBiljke}`);
-        biljke.value = biljke.value.filter(b => b.sifraBiljke !== idBiljke); // Ukloni biljku iz tablice
+        biljke.value = biljke.value.filter(b => b.sifraBiljke !== idBiljke); // Uklonimo biljku iz tablice
         prikaziUkloniBiljku.value = false;
       } catch (error) {
         console.error("Greška prilikom brisanja biljke:", error);
@@ -130,7 +136,7 @@ export default {
     };
 
     onMounted(() => {
-      fetchBiljke(); // Poziv za dohvat biljaka kada se stranica učita
+      fetchBiljke();  // Dohvat biljaka kada se stranica učita
     });
 
     return {
