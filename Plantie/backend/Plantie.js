@@ -135,8 +135,22 @@ app.delete("/api/biljke/:sifraBiljke", (req, res) => {
 app.post("/api/PregledNarudzbiKorisnika", (req, res) => {
   const { nazivBiljke, velicinaBiljke, kolicina, ID_korisnika, sifraBiljke, datumPrimanja, total } = req.body;
 
-  // Ako datum nije poslan, postaviti na trenutni datum u ispravnom formatu
-  const datum = datumPrimanja || new Date().toISOString().slice(0, 19).replace("T", " "); // Prilagodba formata
+  // Funkcija za formatiranje datuma
+  const formatirajDatum = (datum) => {
+    const d = new Date(datum);
+    const godina = d.getFullYear();
+    const mjesec = String(d.getMonth() + 1).padStart(2, '0');
+    const dan = String(d.getDate()).padStart(2, '0');
+    const sati = String(d.getHours()).padStart(2, '0');
+    const minuti = String(d.getMinutes()).padStart(2, '0');
+    const sekunde = String(d.getSeconds()).padStart(2, '0');
+    return `${godina}-${mjesec}-${dan} ${sati}:${minuti}:${sekunde}`;
+  };
+
+  // Ako datum nije poslan, koristimo trenutni datum u ispravnom formatu
+  const datum = datumPrimanja 
+    ? formatirajDatum(datumPrimanja) // Formatiraj poslani datum
+    : formatirajDatum(new Date());  // Koristi trenutni datum ako nije poslan
 
   const query = `INSERT INTO Narudzba (nazivBiljke, velicinaBiljke, kolicina, ID_korisnika, sifraBiljke, datumPrimanja, total) VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
@@ -152,6 +166,7 @@ app.post("/api/PregledNarudzbiKorisnika", (req, res) => {
     });
   });
 });
+
 
 // ENDPOINT - Brisanje narudžbe prema ID-u
 app.delete("/api/narudzbe/:ID_narudzbe", (req, res) => {

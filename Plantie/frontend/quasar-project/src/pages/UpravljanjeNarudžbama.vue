@@ -91,19 +91,19 @@ export default {
 
     // Funkcija za formatiranje datuma u željeni format
     const formatirajDatum = (datum) => {
-      const d = new Date(datum);
-      
-      const godina = d.getFullYear();
-      const mjesec = String(d.getMonth() + 1).padStart(2, '0'); // Mjeseci su od 0, pa dodajemo 1
-      const dan = String(d.getDate()).padStart(2, '0');
-      
-      const sati = String(d.getHours()).padStart(2, '0');
-      const minuti = String(d.getMinutes()).padStart(2, '0');
-      const sekunde = String(d.getSeconds()).padStart(2, '0');
-      
-      // Vraćamo datum u formatu "YYYY-MM-DD HH:mm:ss"
-      return `${godina}-${mjesec}-${dan} ${sati}:${minuti}:${sekunde}`;
-    };
+  const d = new Date(datum);
+  const godina = d.getFullYear();
+  const mjesec = String(d.getMonth() + 1).padStart(2, '0');
+  const dan = String(d.getDate()).padStart(2, '0');
+  const sati = String(d.getHours()).padStart(2, '0');
+  const minuti = String(d.getMinutes()).padStart(2, '0');
+  const sekunde = String(d.getSeconds()).padStart(2, '0');
+  return `${godina}-${mjesec}-${dan} ${sati}:${minuti}:${sekunde}`;
+};
+
+// Primjena:
+const datum = formatirajDatum("2024-06-12T17:19:23.000Z"); // Rezultat: "2024-06-12 17:19:23"
+
 
     // Axios poziv za dohvat svih narudžbi
     const fetchNarudzbe = async () => {
