@@ -37,13 +37,95 @@ app.get("/api/korisnici", (request, response) => {
     response.send(results);
   });
 });
-// ENDPOINT POPIS Biljaka
-app.get("/api/biljke", (request, response) => {
-  connection.query("SELECT * FROM Biljka", (error, results) => {
-    if (error) throw error;
-    response.send(results);
+
+// ENDPOINT LogIn korisnika
+app.get('/api/login', (req, res) => {
+  const { id, lozinka } = req.query;  // Koristi 'id' i 'lozinka' jer su to parametri koje šalje frontend
+  console.log('Received id:', id, 'lozinka:', lozinka); // Provjera podataka
+
+  const query = 'SELECT * FROM korisnik WHERE id = ? AND lozinka = ?';
+  connection.query(query, [id, lozinka], (err, results) => {
+    if (err) {
+      console.error('Error querying database:', err); // Provjera grešaka u SQL upitu
+      return res.status(500).json({ error: 'Greška pri prijavi korisnika' });
+    }
+    if (results.length > 0) {
+      const korisnik = results[0];
+      res.json({
+        success: true,
+        message: `Uspješno ste logirani! Ime i prezime: ${korisnik.ime} ${korisnik.prezime}`
+      });
+    } else {
+      res.status(404).json({ error: 'Neispravan ID ili lozinka.' });
+    }
   });
 });
+
+// ENDPOINT REGISTRACIJA KORISNIKA
+app.post('/api/registracija', (req, res) => {
+  const { id, ime, prezime, korime, lozinka } = req.body;
+
+  // Provjera da li su svi podaci uneseni
+  if (!id || !ime || !prezime || !korime || !lozinka) {
+    return res.status(400).json({ error: 'Molimo unesite sve podatke: ID, ime, prezime, korisničko ime i lozinku.' });
+  }
+
+  // Provjera da li već postoji korisnik s tim ID-om
+  const checkQuery = 'SELECT * FROM korisnik WHERE id = ?';
+  connection.query(checkQuery, [id], (err, results) => {
+    if (err) {
+      console.error('Greška pri provjeri ID-a:', err);
+      return res.status(500).json({ error: 'Greška pri provjeri ID-a.' });
+    }
+
+    if (results.length > 0) {
+      return res.status(400).json({ error: 'ID je već u uporabi. Molimo odaberite drugi ID.' });
+    }
+
+    // Unos korisnika u bazu podataka
+    const query = `INSERT INTO korisnik (id, ime, prezime, korime, lozinka) VALUES (?, ?, ?, ?, ?)`;
+
+    connection.query(query, [id, ime, prezime, korime, lozinka], (err, results) => {
+      if (err) {
+        console.error('Greška pri registraciji korisnika:', err);
+        return res.status(500).json({ error: 'Greška pri registraciji korisnika' });
+      }
+
+      res.status(200).json({
+        message: 'Korisnik uspješno registriran!',
+        id: id  // Vraćamo ID korisnika koji je ručno unesen
+      });
+    });
+  });
+});
+
+// ENDPOINT biljke
+app.get("/api/biljke", (req, res) => {
+  const { searchQuery, searchByCategory, searchByName } = req.query;
+
+  let query = "SELECT * FROM Biljka WHERE 1=1"; // Osnovni upit
+  const params = [];
+
+  if (searchQuery) {
+    if (searchByCategory === "true") {
+      query += " AND vrstaBiljke LIKE ?";
+      params.push(`%${searchQuery}%`);  // Pretraga prema vrsti biljke
+    }
+    if (searchByName === "true") {
+      query += " AND nazivBiljke LIKE ?";
+      params.push(`%${searchQuery}%`);  // Pretraga prema nazivu biljke
+    }
+  }
+
+  connection.query(query, params, (error, results) => {
+    if (error) {
+      console.error("Greška prilikom pretrage biljaka:", error);
+      return res.status(500).json({ error: "Greška prilikom pretrage biljaka" });
+    }
+    res.json(results); // Pošaljite rezultate
+  });
+});
+
 // ENDPOINT POPIS NARUDŽBA
 app.get("/api/narudzbe", (request, response) => {
   connection.query("SELECT * FROM Kosarica", (error, results) => {
