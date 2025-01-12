@@ -6,7 +6,7 @@
       </q-card-section>
 
       <q-card-section>
-        <!-- Input polje za pretraživanje -->
+        <!-- Input polje za pretragu -->
         <q-input
           v-model="searchQuery"
           label="Unesite pojam za pretragu"
@@ -17,12 +17,12 @@
         <!-- Checkbox za odabir pretrage po kategoriji ili nazivu -->
         <div class="q-mt-md">
           <q-checkbox
-            v-model="searchByAuthor"
-            label="Pretraži po kategoriji"
+            v-model="searchByCategory"
+            label="Pretraži po vrsti biljke"
           />
           <q-checkbox
-            v-model="searchByTitle"
-            label="Pretraži po nazivu"
+            v-model="searchByName"
+            label="Pretraži po nazivu biljke"
           />
         </div>
 
@@ -31,68 +31,118 @@
           label="Traži"
           color="green"
           class="q-mt-md"
-          @click="searchBooks"
+          @click="searchPlants"
         />
       </q-card-section>
 
       <!-- Tabela za prikaz rezultata pretrage -->
-      <q-card-section>
+      <q-card-section v-if="filteredPlants.length > 0">
         <q-table
-          :rows="filteredBooks"
+          :rows="filteredPlants"
           :columns="columns"
-          row-key="id"
+          row-key="sifraBiljke"
         />
+      </q-card-section>
+
+      <!-- Poruka kada nema rezultata pretrage -->
+      <q-card-section v-else-if="searchQuery && filteredPlants.length === 0">
+        <div class="text-subtitle1 text-center q-mt-md">
+          Nema rezultata pretrage.
+        </div>
+      </q-card-section>
+
+      <!-- Poruka kada nije uneseno ništa u pretragu -->
+      <q-card-section v-if="!searchQuery">
+        <div class="text-subtitle1 text-center q-mt-md">
+          Unesite pojam za pretragu ili prilagodite kriterije.
+        </div>
       </q-card-section>
     </q-card>
   </q-page>
 </template>
 
 <script>
-import { ref } from 'vue';
+import axios from "axios";
+import { ref, onMounted } from "vue";
 
 export default {
   setup() {
-    const searchQuery = ref('');
-    const searchByAuthor = ref(false);
-    const searchByTitle = ref(false);
+    const searchQuery = ref(""); // Unos za pretragu
+    const searchByCategory = ref(false); // Checkbox za pretragu po vrsti biljke
+    const searchByName = ref(false); // Checkbox za pretragu po nazivu biljke
+    const allPlants = ref([]); // Sve biljke
+    const filteredPlants = ref([]); // Rezultati pretrage
+    const loading = ref(false);
 
-    // Dummy podaci za knjige
-    const books = ref([
-      { id: 1, title: 'Fahrenheit 451', author: 'Ray Bradbury', year: 1953 },
-      { id: 2, title: 'Knjiga 2', author: 'Autor 2' },
-      { id: 3, title: 'Knjiga 3', author: 'Autor 1' },
-    ]);
-
+    // Kolone za tabelu
     const columns = [
-      { name: 'title', label: 'Naslov', align: 'left', field: 'title' },
-      { name: 'author', label: 'Autor', align: 'left', field: 'author' }
+      { name: "sifraBiljke", label: "Šifra biljke", align: "left", field: "sifraBiljke" },
+      { name: "nazivBiljke", label: "Naziv biljke", align: "left", field: "nazivBiljke" },
+      { name: "vrstaBiljke", label: "Vrsta biljke", align: "left", field: "vrstaBiljke" },
+      { name: "opisBiljke", label: "Opis biljke", align: "left", field: "opisBiljke" },
+      { name: "dostupnaKolicina", label: "Dostupna količina", align: "center", field: "dostupnaKolicina" },
+      { name: "cijena", label: "Cijena", align: "center", field: "cijena" },
     ];
 
-    const filteredBooks = ref([]);
+    // Dohvati sve biljke
+    async function fetchBiljke() {
+      loading.value = true;
+      try {
+        const response = await axios.get("http://localhost:3000/api/biljke");
+        allPlants.value = response.data; // Pohranjujemo sve biljke
+        filteredPlants.value = allPlants.value; // Na početku prikazujemo sve biljke
+      } catch (error) {
+        console.error("Greška prilikom dohvaćanja biljaka:", error);
+      } finally {
+        loading.value = false;
+      }
+    }
 
-    // Funkcija za pretraživanje biljke
-function searchBooks() {
-   filteredBooks.value = books.value.filter((book) => {
-      const matchesAuthor = searchByAuthor.value && book.author.toLowerCase().includes(searchQuery.value.toLowerCase());
-      const matchesTitle = searchByTitle.value && book.title.toLowerCase().includes(searchQuery.value.toLowerCase());
-      return matchesAuthor || matchesTitle;
-   });
-   console.log(filteredBooks.value); // Dodaj ovo za proveru
-}
+    // Pretraga biljaka
+    async function searchPlants() {
+      // Pronađi biljke na temelju unosa pretrage
+      filteredPlants.value = allPlants.value.filter(plant => {
+        let matchesCategory = true;
+        let matchesName = true;
 
+        // Ako pretražujemo po kategoriji
+        if (searchByCategory.value && searchQuery.value) {
+          matchesCategory = plant.vrstaBiljke.toLowerCase().includes(searchQuery.value.toLowerCase());
+        }
+
+        // Ako pretražujemo po nazivu
+        if (searchByName.value && searchQuery.value) {
+          matchesName = plant.nazivBiljke.toLowerCase().includes(searchQuery.value.toLowerCase());
+        }
+
+        // Ako ni jedan kriterij nije zadovoljen, izuzmi biljku
+        return matchesCategory && matchesName;
+      });
+    }
+
+    onMounted(() => {
+      fetchBiljke(); // Dohvati sve biljke kada je komponenta montirana
+    });
 
     return {
       searchQuery,
-      searchByAuthor,
-      searchByTitle,
+      searchByCategory,
+      searchByName,
+      allPlants,
+      filteredPlants,
       columns,
-      filteredBooks,
-      searchBooks
+      loading,
+      searchPlants,
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
-
 </style>
+
+
+
+
+
+

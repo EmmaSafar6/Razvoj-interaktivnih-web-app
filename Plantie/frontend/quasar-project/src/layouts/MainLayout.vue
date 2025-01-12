@@ -79,7 +79,7 @@ const linksList = [
   },
   {
     title: 'PretrazivanjeBilja',
-    caption: 'Pretraži bilja',
+    caption: 'Pretraži bilje',
     icon: 'search',
     to: '/pretrazivanje'
   },
