@@ -19,7 +19,7 @@
       >
         <!-- Akcija za dodavanje korisnika -->
         <q-fab-action color="primary" @click="otvoriDodavanjeKorisnika" icon="add" label="Dodaj korisnika" />
-        
+
         <!-- Akcija za uklanjanje korisnika -->
         <q-fab-action color="negative" @click="otvoriUklanjanjeKorisnika" icon="delete" label="Ukloni korisnika" />
       </q-fab>
@@ -35,7 +35,10 @@
           <q-input v-model="noviKorisnik.ime" label="Ime" />
           <q-input v-model="noviKorisnik.prezime" label="Prezime" />
           <q-input v-model="noviKorisnik.email" label="Email" />
+          <q-input v-model="noviKorisnik.lozinka" label="Lozinka" />
+          <q-input v-model="noviKorisnik.adresa" label="Adresa" />
           <q-input v-model="noviKorisnik.telefon" label="Telefon" />
+
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="Odustani" color="primary" @click="prikaziDodajKorisnika = false" />
@@ -75,13 +78,15 @@ export default {
       { name: 'Ime_korisnika', align: 'left', label: 'Ime', field: 'Ime_korisnika' },
       { name: 'Prezime_korisnika', align: 'left', label: 'Prezime', field: 'Prezime_korisnika' },
       { name: 'Email_korisnika', align: 'left', label: 'Email', field: 'Email_korisnika' },
+      { name: 'Lozinka_korisnika', align: 'left', label: 'Lozinka', field: 'Lozinka_korisnika' },
+      { name: 'Adresa_korisnika', align: 'left', label: 'Adresa', field: 'Adresa_korisnika' },
       { name: 'Kontakt_korisnika', align: 'left', label: 'Telefon', field: 'Kontakt_korisnika' },
     ];
 
     const fab = ref(false);
     const prikaziDodajKorisnika = ref(false);
     const prikaziUkloniKorisnika = ref(false);
-    const noviKorisnik = ref({ ime: "", prezime: "", email: "", telefon: "" });
+    const noviKorisnik = ref({ ime: "", prezime: "", email: "", telefon: "", lozinka: "", adresa:"" });
     const korisnikZaUklanjanje = ref("");
 
     const fetchKorisnik = async () => {
@@ -101,9 +106,11 @@ export default {
           Ime_korisnika: noviKorisnik.value.ime,
           Prezime_korisnika: noviKorisnik.value.prezime,
           Email_korisnika: noviKorisnik.value.email,
+          Lozinka_korisnika: noviKorisnik.value.lozinka,
+          Adresa_korisnika: noviKorisnik.value.adresa,
           Kontakt_korisnika: noviKorisnik.value.telefon,
         });
-        noviKorisnik.value = { ime: "", prezime: "", email: "", telefon: "" };
+        noviKorisnik.value = { ime: "", prezime: "", email: "", telefon: "", lozinka: "", adresa:"" };
         prikaziDodajKorisnika.value = false;
       } catch (error) {
         console.error("Greška prilikom dodavanja korisnika:", error);

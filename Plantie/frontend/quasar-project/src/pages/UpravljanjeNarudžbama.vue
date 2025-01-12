@@ -19,7 +19,7 @@
       >
         <!-- Akcija za dodavanje narudžbe -->
         <q-fab-action color="primary" @click="otvoriDodavanjeNarudzbe" icon="add" label="Dodaj narudžbu" />
-        
+
         <!-- Akcija za uklanjanje narudžbe -->
         <q-fab-action color="negative" @click="otvoriUklanjanjeNarudzbe" icon="delete" label="Ukloni narudžbu" />
       </q-fab>
@@ -37,7 +37,6 @@
           <q-input v-model="novaNarudzba.kolicina" label="Količina" type="number" />
           <q-input v-model="novaNarudzba.ID_korisnika" label="ID korisnika" />
           <q-input v-model="novaNarudzba.sifraBiljke" label="ID biljke" />
-          <q-input v-model="novaNarudzba.total" label="Ukupni iznos" type="number" />
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="Odustani" color="primary" @click="prikaziDodajNarudzbu = false" />
@@ -117,41 +116,52 @@ const datum = formatirajDatum("2024-06-12T17:19:23.000Z"); // Rezultat: "2024-06
 
     // Axios poziv za dodavanje narudžbe
     const dodajNarudzbu = async () => {
-      try {
-        const datumPrimanja = formatirajDatum(new Date()); // Formatiramo trenutni datum
-        const response = await axios.post("http://localhost:3000/api/PregledNarudzbiKorisnika", {
-          ...novaNarudzba.value,
-          datumPrimanja: datumPrimanja, // Dodajemo formatirani datum
-        });
+  try {
+    // Send a POST request to add a new order
+    const response = await axios.post("http://localhost:3000/api/dodavanjenarudzbe", {
+      nazivBiljke: novaNarudzba.value.nazivBiljke,
+      velicinaBiljke: novaNarudzba.value.velicinaBiljke,
+      kolicina: novaNarudzba.value.kolicina,
+      ID_korisnika: novaNarudzba.value.ID_korisnika,
+      sifraBiljke: novaNarudzba.value.sifraBiljke,
+    });
 
-        narudzbe.value.push({
-          ID_Kosarice: response.data.narudzbaId,
-          nazivBiljke: novaNarudzba.value.nazivBiljke,
-          velicinaBiljke: novaNarudzba.value.velicinaBiljke,
-          kolicina: novaNarudzba.value.kolicina,
-          ID_korisnika: novaNarudzba.value.ID_korisnika,
-          sifraBiljke: novaNarudzba.value.sifraBiljke,
-          datumPrimanja: datumPrimanja, // Dodajemo datum u tablicu
-          total: novaNarudzba.value.total,
-        });
+    // Add the new order to the local list of orders
+    narudzbe.value.push({
+      ID_Kosarice: response.data.narudzbaId,  // Assuming your backend returns the new ID
+      nazivBiljke: novaNarudzba.value.nazivBiljke,
+      velicinaBiljke: novaNarudzba.value.velicinaBiljke,
+      kolicina: novaNarudzba.value.kolicina,
+      ID_korisnika: novaNarudzba.value.ID_korisnika,
+      sifraBiljke: novaNarudzba.value.sifraBiljke,
+    });
 
-        novaNarudzba.value = { nazivBiljke: "", velicinaBiljke: "", kolicina: 0, ID_korisnika: "", sifraBiljke: "", total: 0 };
-        prikaziDodajNarudzbu.value = false;
-      } catch (error) {
-        console.error("Greška prilikom dodavanja narudžbe:", error);
-      }
-    };
+    // Clear the form
+    novaNarudzba.value = { nazivBiljke: "", velicinaBiljke: "", kolicina: 0, ID_korisnika: "", sifraBiljke: "" };
+    prikaziDodajNarudzbu.value = false;
+
+    // Optionally provide feedback
+    alert("Narudžba uspješno dodana!");
+  } catch (error) {
+    console.error("Greška prilikom dodavanja narudžbe:", error);
+    alert("Došlo je do greške prilikom dodavanja narudžbe.");
+  }
+};
+
 
     // Axios poziv za brisanje narudžbe prema ID-u
-    const ukloniNarudzbu = async (ID_narudzbe) => {
-      try {
-        await axios.delete(`http://localhost:3000/api/narudzbe/${ID_narudzbe}`);
-        narudzbe.value = narudzbe.value.filter(n => n.ID_Kosarice !== ID_narudzbe); // Ukloni narudžbu iz tablice
-        prikaziUkloniNarudzbu.value = false;
-      } catch (error) {
-        console.error("Greška prilikom brisanja narudžbe:", error);
-      }
-    };
+    const ukloniNarudzbu = async (ID_Kosarice) => {
+  console.log('ID_Kosarice:', ID_Kosarice); // Proverite vrednost
+  try {
+    await axios.delete(`http://localhost:3000/api/brisanjenarudzbe/${ID_Kosarice}`);
+    narudzbe.value = narudzbe.value.filter(n => n.ID_Kosarice !== ID_Kosarice);
+    prikaziUkloniNarudzbu.value = false;
+    alert('Narudžba uspešno uklonjena.');
+  } catch (error) {
+    console.error("Greška prilikom brisanja narudžbe:", error);
+  }
+};
+
 
     const otvoriDodavanjeNarudzbe = () => {
       prikaziDodajNarudzbu.value = true;

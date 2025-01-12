@@ -71,9 +71,9 @@ app.get("/api/narudzbe", (request, response) => {
     //ENDPOINT DODAJ KORISNIKA
     app.post('/api/Korisnik', (req, res) => {
       const { ime, prezime, email, telefon } = req.body;
-      const query = `INSERT INTO Korisnik (Ime_korisnika, Prezime_korisnika, Email_korisnika, Kontakt_korisnika) VALUES (?, ?, ?, ?)`;
+      const query = `INSERT INTO Korisnik (Ime_korisnika, Prezime_korisnika, Email_korisnika,Lozinka_korisnika, Adresa_korisnika, Kontakt_korisnika) VALUES (?, ?, ?, ?, ?, ?)`;
       
-      connection.query(query, [ime, prezime, email, telefon], (err, results) => {
+      connection.query(query, [ime, prezime, email, lozinka, adresa ,telefon], (err, results) => {
         if (err) {
           console.error('Greška pri dodavanju korisnika:', err);
           res.status(500).json({ error: 'Greška pri dodavanju korisnika' });
@@ -132,29 +132,16 @@ app.delete("/api/biljke/:sifraBiljke", (req, res) => {
 
 // ENDPOINT - dodavanje narudzbe
 
-app.post("/api/PregledNarudzbiKorisnika", (req, res) => {
-  const { nazivBiljke, velicinaBiljke, kolicina, ID_korisnika, sifraBiljke, datumPrimanja, total } = req.body;
+app.post("/api/dodavanjenarudzbe", (req, res) => {
+  const { nazivBiljke, velicinaBiljke, kolicina, ID_korisnika, sifraBiljke } = req.body;
 
-  // Funkcija za formatiranje datuma
-  const formatirajDatum = (datum) => {
-    const d = new Date(datum);
-    const godina = d.getFullYear();
-    const mjesec = String(d.getMonth() + 1).padStart(2, '0');
-    const dan = String(d.getDate()).padStart(2, '0');
-    const sati = String(d.getHours()).padStart(2, '0');
-    const minuti = String(d.getMinutes()).padStart(2, '0');
-    const sekunde = String(d.getSeconds()).padStart(2, '0');
-    return `${godina}-${mjesec}-${dan} ${sati}:${minuti}:${sekunde}`;
-  };
+  // SQL upit za dodavanje narudžbe
+  const query = `
+    INSERT INTO Kosarica (nazivBiljke, velicinaBiljke, kolicina, ID_korisnika, sifraBiljke)
+    VALUES (?, ?, ?, ?, ?)
+  `;
 
-  // Ako datum nije poslan, koristimo trenutni datum u ispravnom formatu
-  const datum = datumPrimanja 
-    ? formatirajDatum(datumPrimanja) // Formatiraj poslani datum
-    : formatirajDatum(new Date());  // Koristi trenutni datum ako nije poslan
-
-  const query = `INSERT INTO Narudzba (nazivBiljke, velicinaBiljke, kolicina, ID_korisnika, sifraBiljke, datumPrimanja, total) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-
-  connection.query(query, [nazivBiljke, velicinaBiljke, kolicina, ID_korisnika, sifraBiljke, datum, total], (err, results) => {
+  connection.query(query, [nazivBiljke, velicinaBiljke, kolicina, ID_korisnika, sifraBiljke], (err, results) => {
     if (err) {
       console.error('Greška prilikom dodavanja narudžbe:', err);
       return res.status(500).json({ error: 'Greška prilikom dodavanja narudžbe' });
@@ -168,12 +155,13 @@ app.post("/api/PregledNarudzbiKorisnika", (req, res) => {
 });
 
 
+
 // ENDPOINT - Brisanje narudžbe prema ID-u
-app.delete("/api/narudzbe/:ID_narudzbe", (req, res) => {
-  const ID_narudzbe = req.params.id;
-  const query = 'DELETE FROM Narudzbe WHERE ID_narudzbe = ?';
+app.delete("/api/brisanjenarudzbe/:ID_Kosarice", (req, res) => {
+  const ID_Kosarice = req.params.ID_Kosarice;  // Correctly reference the URL parameter
+  const query = 'DELETE FROM Kosarica WHERE ID_Kosarice = ?';
   
-  connection.query(query, [ID_narudzbe], (err, results) => {
+  connection.query(query, [ID_Kosarice], (err, results) => {
     if (err) {
       console.error('Greška prilikom brisanja narudžbe:', err);
       return res.status(500).json({ error: 'Greška prilikom brisanja narudžbe' });
@@ -184,6 +172,7 @@ app.delete("/api/narudzbe/:ID_narudzbe", (req, res) => {
     res.json({ message: 'Narudžba uspješno obrisana' });
   });
 });
+
 
 
 
