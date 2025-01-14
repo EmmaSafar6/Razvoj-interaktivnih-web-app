@@ -13,11 +13,11 @@
       row-key="ID_Kosarice"
     />
 
-    <!-- FAB gumb za administrativne opcije -->
+    <!-- FAB gumb za opcije korisnika -->
     <div class="q-pa-md flex flex-center">
       <q-fab
         v-model="fab"
-        label="Opcije korisnika"
+        label="Opcije"
         color="green"
         icon="menu"
         direction="down"
