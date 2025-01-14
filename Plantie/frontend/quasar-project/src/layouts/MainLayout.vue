@@ -106,7 +106,13 @@ const linksList = [
     caption: 'Registrirajte se',
     icon: 'person_add',
     to: '/registracija'
-  }
+  },
+  {
+    title: 'Narudžbe',
+    caption: 'Naruči!',
+    icon: 'library_books',
+    to: '/narudzba'
+  },
 ]
 
 

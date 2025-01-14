@@ -9,7 +9,8 @@ const routes = [
       { path: '/onama', component: () => import('pages/ONamaPage.vue') },
       { path: '/lokacija', component: () => import('pages/LokacijaPage.vue') },
       { path: '/login', component: () => import('pages/LoginPage.vue') },
-      { path: '/registracija', component: () => import('pages/RegistracijaPage.vue') }
+      { path: '/registracija', component: () => import('pages/RegistracijaPage.vue') },
+      { path: '/narudzba', component: () => import('pages/NarudzbaPage.vue') }
     ]
   },
   {
