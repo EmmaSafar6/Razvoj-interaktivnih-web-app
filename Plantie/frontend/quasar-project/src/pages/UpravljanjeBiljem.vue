@@ -12,14 +12,14 @@
       <q-fab
         v-model="fab"
         label="Opcije admina"
-        color="green"
+        color="teal"
         icon="menu"
         direction="down"
         size="sm"
       >
         <!-- Akcija za dodavanje biljke -->
         <q-fab-action color="primary" @click="otvoriDodavanjeBiljke" icon="add" label="Dodaj biljku" />
-        
+
         <!-- Akcija za uklanjanje biljke -->
         <q-fab-action color="negative" @click="otvoriUklanjanjeBiljke" icon="delete" label="Ukloni biljku" />
       </q-fab>

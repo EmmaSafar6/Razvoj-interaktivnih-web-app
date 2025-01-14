@@ -12,7 +12,7 @@
       <q-fab
         v-model="fab"
         label="Opcije admina"
-        color="green"
+        color="teal"
         icon="menu"
         direction="down"
         size="sm"

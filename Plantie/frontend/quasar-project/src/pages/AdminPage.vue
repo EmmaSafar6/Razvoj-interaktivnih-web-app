@@ -56,8 +56,13 @@ defineOptions({
 
   /* Stil za logo */
   .logo {
-    width: 300px; /* Povećana veličina loga */
+    width: 300px; /* Početna veličina loga */
     height: auto; /* Održavanje omjera */
     margin-top: 30px; /* Prostor iznad loga */
+    transition: transform 0.3s ease-in-out; /* Dodana tranzicija za glatki efekt */
+  }
+
+  .logo:hover {
+    transform: scale(1.8); /* Efekt povećanja za 10% */
   }
 </style>
