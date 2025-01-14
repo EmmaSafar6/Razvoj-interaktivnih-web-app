@@ -1,12 +1,13 @@
 <template>
   <q-page>
     <h1>Registracija</h1>
-    
-    <q-input filled v-model="userId" label="ID" />
-    <q-input filled v-model="firstName" label="Ime" />
-    <q-input filled v-model="lastName" label="Prezime" />
-    <q-input filled v-model="username" label="Korisničko ime" />
-    <q-input filled v-model="password" label="Lozinka" type="password" />
+    <q-input filled v-model="ime" label="Ime" />
+    <q-input filled v-model="prezime" label="Prezime" />
+    <q-input filled v-model="email" label="Email" />
+    <q-input filled v-model="lozinka" label="Lozinka" type="password" />
+    <q-input filled v-model="adresa" label="Adresa"/>
+    <q-input filled v-model="telefon" label="Telefon" />
+
 
     <q-btn color="primary" label="Potvrdi" @click="registerUser" />
   </q-page>
@@ -18,24 +19,26 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      userId: '',      // ID korisnika
-      firstName: '',   // Ime
-      lastName: '',    // Prezime
-      username: '',    // Korisničko ime
-      password: '',    // Lozinka
+      ime: '',
+      prezime: '',
+      email: '',
+      lozinka: '',
+      adresa: '',
+      telefon: ''
     };
   },
   methods: {
     async registerUser() {
       // Provjera da li su svi podaci uneseni
-      if (this.userId && this.firstName && this.lastName && this.username && this.password) {
+      if (this.ime && this.prezime && this.email && this.lozinka && this.adresa && this.telefon) {
         try {
-          const response = await axios.post('http://localhost:3000/api/registracija', {
-            id: this.userId,
-            ime: this.firstName,
-            prezime: this.lastName,
-            korime: this.username,
-            lozinka: this.password
+          const response = await axios.post('http://localhost:3000/api/Korisnik', {
+            ime: this.ime,
+            prezime: this.prezime,
+            email: this.email,
+            lozinka: this.lozinka,
+            adresa: this.adresa,
+            telefon: this.telefon
           });
 
           // Ako je registracija uspješna

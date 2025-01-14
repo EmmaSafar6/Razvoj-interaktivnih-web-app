@@ -40,64 +40,77 @@ app.get("/api/korisnici", (request, response) => {
 
 // ENDPOINT LogIn korisnika
 app.get('/api/login', (req, res) => {
-  const { id, lozinka } = req.query;  // Koristi 'id' i 'lozinka' jer su to parametri koje šalje frontend
-  console.log('Received id:', id, 'lozinka:', lozinka); // Provjera podataka
+  const { ID_korisnika, Lozinka_korisnika } = req.query;  // Correctly retrieve the query parameters
+  console.log('ID_korisnika:', ID_korisnika, 'Lozinka_korisnika:', Lozinka_korisnika); // Correct logging of parameters
 
-  const query = 'SELECT * FROM korisnik WHERE id = ? AND lozinka = ?';
-  connection.query(query, [id, lozinka], (err, results) => {
+  // SQL query to find the user in the database
+  const query = 'SELECT Ime_korisnika, Prezime_korisnika FROM Korisnik WHERE ID_korisnika = ? AND Lozinka_korisnika = ?';
+  connection.query(query, [ID_korisnika, Lozinka_korisnika], (err, results) => {
     if (err) {
-      console.error('Error querying database:', err); // Provjera grešaka u SQL upitu
-      return res.status(500).json({ error: 'Greška pri prijavi korisnika' });
+      console.error('Error querying database:', err); // Log any SQL errors
+      return res.status(500).json({ error: 'Greška pri prijavi korisnika' });  // Internal server error response
     }
+
+    // If user is found in the database
     if (results.length > 0) {
-      const korisnik = results[0];
+      const korisnik = results[0];  // Get the first user from the result set
       res.json({
         success: true,
-        message: `Uspješno ste logirani! Ime i prezime: ${korisnik.ime} ${korisnik.prezime}`
+        message: `Uspješno ste logirani! Ime i prezime: ${korisnik.Ime_korisnika} ${korisnik.Prezime_korisnika}`  // Correctly access the user data
       });
     } else {
-      res.status(404).json({ error: 'Neispravan ID ili lozinka.' });
+      res.status(404).json({ error: 'Neispravan ID ili lozinka.' });  // If no user is found
     }
   });
 });
+ // ENDPOINT ZA DOHVAT KOMENTAA
+app.get('/api/zahtjevi', (req, res) => {
+  const zahtjev = req.query.adminId;
+  const query = `SELECT * FROM ZahtjeviZaAdmina`
 
-// ENDPOINT REGISTRACIJA KORISNIKA
-app.post('/api/registracija', (req, res) => {
-  const { id, ime, prezime, korime, lozinka } = req.body;
+  connection.query(query, [zahtjev], (err, results) => {
+    if (err) {
+      console.error('Error during query execution:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+// ENDPOINT ZA OBJAVU KOMENTARA
 
-  // Provjera da li su svi podaci uneseni
-  if (!id || !ime || !prezime || !korime || !lozinka) {
-    return res.status(400).json({ error: 'Molimo unesite sve podatke: ID, ime, prezime, korisničko ime i lozinku.' });
+app.post('/api/zahtjev', (req, res) => {
+  const { zahtjev } = req.body; // Destructure the comment from the request body
+
+  if (!zahtjev || zahtjev.trim() === '') {
+    return res.status(400).json({ error: 'Zahtjev ne može biti prazan.' }); // Validate input
   }
 
-  // Provjera da li već postoji korisnik s tim ID-om
-  const checkQuery = 'SELECT * FROM korisnik WHERE id = ?';
-  connection.query(checkQuery, [id], (err, results) => {
+  const query = 'INSERT INTO ZahtjeviZaAdmina (Zahtjev) VALUES (?)';
+  connection.query(query, [zahtjev], (err, results) => {
     if (err) {
-      console.error('Greška pri provjeri ID-a:', err);
-      return res.status(500).json({ error: 'Greška pri provjeri ID-a.' });
+      console.error('Greška pri dodavanju zahtjeva:', err);
+      res.status(500).json({ error: 'Greška pri slanju poruke' });
+    } else {
+      res.status(200).json({ insertId: results.insertId, message: 'Poruka zabilježena' });
     }
-
-    if (results.length > 0) {
-      return res.status(400).json({ error: 'ID je već u uporabi. Molimo odaberite drugi ID.' });
-    }
-
-    // Unos korisnika u bazu podataka
-    const query = `INSERT INTO korisnik (id, ime, prezime, korime, lozinka) VALUES (?, ?, ?, ?, ?)`;
-
-    connection.query(query, [id, ime, prezime, korime, lozinka], (err, results) => {
-      if (err) {
-        console.error('Greška pri registraciji korisnika:', err);
-        return res.status(500).json({ error: 'Greška pri registraciji korisnika' });
-      }
-
-      res.status(200).json({
-        message: 'Korisnik uspješno registriran!',
-        id: id  // Vraćamo ID korisnika koji je ručno unesen
-      });
-    });
   });
 });
+
+//ENDPOINT ZA BRISANJE KOMENTARA
+app.delete('/api/zahtjev/:ID_Zahtjeva', (req, res) => {
+  const ID_Zahtjeva = req.params.ID_Zahtjeva;
+  
+  const query = 'DELETE FROM ZahtjeviZaAdmina WHERE ID_Zahtjeva = ?';
+  connection.query(query, [ID_Zahtjeva], (err, results) => {
+    if (err) {
+      console.error('Greška prilikom brisanja korisnika:', err);
+      return res.status(500).json({ error: 'Greška prilikom brisanja korisnika' });
+    }
+    res.json({ message: 'Zahtjev uspješno obrisan' });
+  });
+});
+  
 
 // ENDPOINT biljke
 app.get("/api/biljke", (req, res) => {
@@ -152,7 +165,7 @@ app.get("/api/narudzbe", (request, response) => {
     
     //ENDPOINT DODAJ KORISNIKA
     app.post('/api/Korisnik', (req, res) => {
-      const { ime, prezime, email, telefon } = req.body;
+      const { ime, prezime, email, lozinka, adresa ,telefon } = req.body;
       const query = `INSERT INTO Korisnik (Ime_korisnika, Prezime_korisnika, Email_korisnika,Lozinka_korisnika, Adresa_korisnika, Kontakt_korisnika) VALUES (?, ?, ?, ?, ?, ?)`;
       
       connection.query(query, [ime, prezime, email, lozinka, adresa ,telefon], (err, results) => {

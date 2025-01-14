@@ -3,7 +3,7 @@
     <q-card dark bordered class="bg-grey-9 my-card">
       <q-card-section>
         <!-- Zamijenjen lokalni put za sliku s URL-om -->
-        <img alt="Slika Biljke" src="https://cdn.britannica.com/24/118324-050-BA5BD2FD/Grass-cottage-pink.jpg">
+        <img alt="Slika Biljke" src="https://cdn.britannica.com/24/118324-050-BA5BD2FD/Grass-cottage-pink.jpg" style="width: 50%; height: auto;">
           <div class="text-h3 text-weight-bolder absolute-bottom text-center">
             O nama
           </div>

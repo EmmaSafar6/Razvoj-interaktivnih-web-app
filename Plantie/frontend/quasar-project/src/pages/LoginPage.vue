@@ -10,14 +10,14 @@
             <q-input
               outlined
               filled
-              v-model="userId"
-              label="ID Korisnika"
+              v-model="ID_korisnika"
+              label="id"
               class="q-mt-md bg-input-green"
             />
             <q-input
               outlined
               filled
-              v-model="userPassword"
+              v-model="Lozinka_korisnika"
               label="Lozinka"
               type="password"
               class="q-mt-md bg-input-green"
@@ -62,36 +62,36 @@ import { useRouter } from 'vue-router';
 export default {
   data() {
     return {
-      userId: '',
-      userPassword: '',
+      ID_korisnika: '',
+      Lozinka_korisnika: '',
       adminId: ''
     };
   },
   methods: {
     // Metoda za prijavu korisnika
     async loginUser() {
-      if (this.userId && this.userPassword) {
-        console.log('Sending id:', this.userId, 'lozinka:', this.userPassword);  // Dodan console log za praćenje unesenih podataka
-        try {
-          // API poziv za prijavu korisnika
-          const response = await axios.get('http://localhost:3000/api/login', {
-            params: {
-              id: this.userId,            // 'id' umjesto 'userId'
-              lozinka: this.userPassword   // 'lozinka' umjesto 'userPassword'
-            }
-          });
-
-          // Ako je prijava uspješna, prikazuje se poruka s imenom i prezimenom
-          alert(response.data.message);
-        } catch (error) {
-          // Ako je došlo do greške, prikazuje se odgovarajuća poruka
-          console.error('Error during login:', error);  // Ispisuje cijeli error objekt
-          alert(error.response ? error.response.data.error : 'Došlo je do greške pri prijavi.');
+  if (this.ID_korisnika && this.Lozinka_korisnika) {
+    console.log('id:', this.ID_korisnika, 'lozinka:', this.Lozinka_korisnika); // For debugging the input values
+    try {
+      // Use GET request and send data as query parameters
+      const response = await axios.get('http://localhost:3000/api/login', {
+        params: {
+          ID_korisnika: this.ID_korisnika,
+          Lozinka_korisnika: this.Lozinka_korisnika
         }
-      } else {
-        alert('Molimo unesite ID korisnika i lozinku.');
-      }
-    },
+      });
+
+      // If login is successful, show the message returned from server
+      alert(response.data.message);
+    } catch (error) {
+      // Handle errors (like the 404 or 500 errors)
+      console.error('Error during login:', error); // Logs the entire error object
+      alert(error.response ? error.response.data.error : 'Došlo je do greške pri prijavi.');
+    }
+  } else {
+    alert('Molimo unesite ispravan ID i lozinku! U slučaju zaborava ID-ja ili lozinke kontaktirajte nas na plantie@veleri.hr');
+  }
+},
 
     // Metoda za prijavu admina
     async loginAdmin() {

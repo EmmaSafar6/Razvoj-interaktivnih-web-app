@@ -1,31 +1,57 @@
 <template>
-  <div id="map" style="height:500px;"></div>
+  <div>
+    <!-- Div za Leaflet kartu -->
+    <div id="map" style="height:600;"></div>
+
+    <!-- Quasar stranica -->
     <q-page padding>
-      <!-- content -->
+      <!-- Naslov -->
+      <div class="text-h5 text-weight-bolder text-center">
+        Lokacija Planite Trgovine
+      </div>
+      <!-- Kartica s opisom -->
+      <q-card>
+        <q-card-section class="text-h2 text-justify">
+          {{ o_nama }}
+        </q-card-section>
+      </q-card>
     </q-page>
-  </template>
+  </div>
+</template>
 
-  <script>
-  import { ref, onMounted } from 'vue';
-  import * as L from 'leaflet';
-  import "leaflet/dist/leaflet.css";
+<script>
+import { ref, onMounted } from 'vue';
+import * as L from 'leaflet';
+import "leaflet/dist/leaflet.css";
 
-  export default {
-    // name: 'PageName',
-    setup(){
-      const initialMap = ref('');
-      onMounted(() => {
-        initialMap.value = L.map('map').setView([45.3264, 14.4411], 19);
+export default {
+  setup() {
+    // Varijabla za kartu
+    const initialMap = ref(null);
+    // Varijabla za tekst
+    const o_nama = ref('Vukovarska ul. 58, 51000, Rijeka');
 
-          L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              maxZoom: 19,
-              attribution: '&copy;<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          }).addTo(initialMap.value);
-        })
-        return {
-          initialMap
-        }
-      }
+    // Inicijalizacija Leaflet karte
+    onMounted(() => {
+      initialMap.value = L.map('map').setView([45.338053, 14.424339], 19);
+
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy;<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(initialMap.value);
+    });
+
+    return {
+      initialMap,
+      o_nama
+    };
   }
+};
+</script>
 
-  </script>
+<style>
+#map {
+  height: 500px;
+  position: relative; /* Omogućuje pozicioniranje sadržaja unutar karte */
+}
+</style>
