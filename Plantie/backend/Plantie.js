@@ -7,7 +7,7 @@ const app = express();
 const port = 3000;
 
 app.use(cors({
-  origin: 'http://localhost:9000'
+  origin: '*'
 }));
 app.use(bodyParser.json());
 
