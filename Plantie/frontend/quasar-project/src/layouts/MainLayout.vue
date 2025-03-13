@@ -113,12 +113,6 @@ const linksList = [
     icon: 'library_books',
     to: '/narudzba'
   },
-  {
-    title: 'Briga cvijeća',
-    caption: 'Saznajte više o brizi naših biljaka',
-    icon: 'help_outline',
-    to: '/briga'
-  },
 ]
 
 
